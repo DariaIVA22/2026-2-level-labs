@@ -39,6 +39,20 @@ def tokenize(text: str) -> Sequence[str] | None:
 
 
 def remove_stop_words(tokens: Sequence[str], stop_words: Sequence[str]) -> Sequence[str] | None:
+    if not isinstance(tokens, (list, tuple)):
+        return None
+    for token in tokens:
+        if not isinstance(token, str):
+            return None
+    if not isinstance(stop_words, (list, tuple)):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
+    if not stop_words:
+        return tokens
+    stop_set = set(stop_words)
+    return [token for token in tokens if token not in stop_set]
     """
     Removes stop words
 
