@@ -15,6 +15,16 @@ ProfileType = tuple[str, FreqDictType, int]
 
 
 def tokenize(text: str) -> Sequence[str] | None:
+    if not isinstance(text, str):
+        return None
+    import re
+    words = text.split()
+    word_list = []
+    for word in words:
+        delete_non_letters = re.sub(r'[^a-zA-Zа-яА-ЯёЁßäöüÄÖÜ]', '', word)
+        if delete_non_letters:
+            word_list.append(delete_non_letters.lower())
+    return word_list
     """
     Splits a text into tokens, converts the tokens into lowercase,
     removes punctuation and other symbols from words
