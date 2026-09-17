@@ -105,6 +105,15 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
+    if not isinstance(freq_dict, dict):
+        return None
+    if not isinstance(top_n, int) or isinstance(top_n, bool):
+        return None
+    if top_n <= 0:
+        return None
+    for key, value in freq_dict.items():
+        if not isinstance(key, str) or not isinstance(value, (int, float)):
+            return None
 
 
 # Mark 6.
