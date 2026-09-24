@@ -136,6 +136,31 @@ def create_language_profile(
         ProfileType | None: Language profile.
         Returns None in case of incorrect input types.
     """
+    if not isinstance(language, str):
+        return None
+    if not isinstance(text, str):
+        return None
+    if not isinstance(stop_words, (list, tuple)):
+        return None
+    for word in stop_words:
+        if not isinstance(word, str):
+            return None
+
+    tokens = tokenize(text)
+    if tokens is None:
+        return None
+
+    clean_tokens = remove_stop_words(tokens, stop_words)
+    if clean_tokens is None:
+        return None
+
+    frequencies = calculate_frequencies(clean_tokens)
+    if frequencies is None:
+        return None
+
+    n_words = len(frequencies)
+    return (language, frequencies, n_words)
+
 
 
 def check_profile(profile: ProfileType) -> bool:
@@ -149,7 +174,30 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+    if not isinstance(profile, tuple):
+        return False
+    if len(profile) != 3:
+        return False
 
+    language, frequencies, n_words = profile
+
+    if not isinstance(language, str):
+        return False
+    if not isinstance(frequencies, dict):
+        return False
+    for key, value in frequencies.items():
+        if not isinstance(key, str):
+            return False
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return False
+
+    if isinstance(n_words, bool) or not isinstance(n_words, int):
+        return False
+    if n_words < 0:
+        return False
+    if n_words != len(frequencies):
+        return False
+    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
