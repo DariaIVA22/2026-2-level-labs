@@ -21,7 +21,7 @@ def tokenize(text: str) -> Sequence[str] | None:
     words = text.split()
     word_list = []
     for word in words:
-        delete_non_letters = re.sub(r'[^a-zA-Zа-яА-ЯёЁßäöüÄÖÜ]', '', word)
+        delete_non_letters = re.sub(r"[^a-zA-Zа-яА-ЯёЁßäöüÄÖÜ]", '', word)
         if delete_non_letters:
             word_list.append(delete_non_letters.lower())
     return word_list
@@ -174,6 +174,7 @@ def check_profile(profile: ProfileType) -> bool:
         bool: Returns True if the profile has right structure and types,
         otherwise returns False.
     """
+
     if not isinstance(profile, tuple):
         return False
     if len(profile) != 3:
