@@ -47,7 +47,7 @@ def main() -> None:
     result = get_top_n_words(freq_dict, 7)
     if not isinstance(result, (list, tuple)):
         return None
-    print("Топ-7 популярных слов текста:", top_7)
+    print("Топ-7 популярных слов текста:", result)
 
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
