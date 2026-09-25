@@ -45,7 +45,7 @@ def main() -> None:
     print("Частотный словарь:", freq_dict)
 
     result = get_top_n_words(freq_dict, 7)
-    if not isinstance(top_7, (list, tuple)):
+    if not isinstance(result, (list, tuple)):
         return None
     print("Топ-7 популярных слов текста:", top_7)
 
