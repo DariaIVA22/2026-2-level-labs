@@ -324,7 +324,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
         return 0.0
 
     squared_errors = [(y - p) ** 2 for y, p in zip(actual, predicted)]
-    return (sum(squared_errors) / len(squared_errors))
+    return float(sum(squared_errors) / len(squared_errors))
 
 
 def compare_profiles_by_mse(

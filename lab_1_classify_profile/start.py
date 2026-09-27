@@ -28,29 +28,46 @@ def main() -> None:
         en_text = file.read()
 
     tokens = tokenize(de_text)
+    if not isinstance(tokens, (list, tuple)):
+        return
     print("Tokens:", tokens)
 
     clean_tokens = remove_stop_words(tokens, stopwords)
+    if not isinstance(clean_tokens, (list, tuple)):
+        return
     print("Tokens without stop-words:", clean_tokens)
 
     freq_dict = calculate_frequencies(clean_tokens)
+    if not isinstance(freq_dict, dict):
+        return
     print("Frequency dictionary:", freq_dict)
 
     top_7 = get_top_n_words(freq_dict, 7)
+    if not isinstance(top_7, (list, tuple)):
+        return
     print("Top-7 words:", top_7)
 
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
 
+    if not (isinstance(de_profile, tuple)
+            and isinstance(en_profile, tuple)
+            and isinstance(unknown_profile, tuple)):
+        return
+
     detected_language = detect_language_by_top_n(
         unknown_profile, de_profile, en_profile, 15
     )
+    if not isinstance(detected_language, str):
+        return
     print("Language:", detected_language)
 
     detected_language_mse = detect_language_by_mse(
         unknown_profile, de_profile, en_profile
     )
+    if not isinstance(detected_language_mse, str):
+        return
     print("Language by MSE:", detected_language_mse)
 
 
