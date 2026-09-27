@@ -42,8 +42,6 @@ def main() -> None:
     print("Frequency dictionary:", freq_dict)
 
     top_7 = get_top_n_words(freq_dict, 7)
-    if not isinstance(top_7, (list, tuple)):
-        return
     print("Top-7 words:", top_7)
 
     de_profile = create_language_profile("de", de_text, stopwords)
