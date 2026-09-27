@@ -4,7 +4,6 @@ Language detection starter.
 
 from lab_1_classify_profile.main import (
     calculate_frequencies,
-    check_profile,
     create_language_profile,
     detect_language_by_mse,
     detect_language_by_top_n,
@@ -55,10 +54,6 @@ def main() -> None:
             and isinstance(en_profile, tuple)
             and isinstance(unknown_profile, tuple)):
         return
-
-    print("de_profile is valid:", check_profile(de_profile))
-    print("en_profile is valid:", check_profile(en_profile))
-    print("unknown_profile is valid:", check_profile(unknown_profile))
 
     detected_language = detect_language_by_top_n(
         unknown_profile, de_profile, en_profile, 15
