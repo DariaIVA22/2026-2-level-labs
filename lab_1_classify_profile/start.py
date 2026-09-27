@@ -38,7 +38,7 @@ def main() -> None:
     print("Frequency dictionary:", freq_dict)
 
     top_7 = get_top_n_words(freq_dict, 7)
-    assert freq_dict is not None
+    assert top_7 is not None
     print("Top-7 words:", top_7)
 
     de_profile = create_language_profile("de", de_text, stopwords)
