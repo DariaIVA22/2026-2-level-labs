@@ -3,7 +3,7 @@ Lab 1.
 
 Language detection
 """
-
+import re
 # pylint:disable=unused-argument
 from typing import Sequence
 
@@ -17,7 +17,6 @@ ProfileType = tuple[str, FreqDictType, int]
 def tokenize(text: str) -> Sequence[str] | None:
     if not isinstance(text, str):
         return None
-    import re
     words = text.split()
     word_list = []
     for word in words:

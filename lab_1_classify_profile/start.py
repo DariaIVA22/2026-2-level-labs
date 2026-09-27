@@ -19,33 +19,33 @@ def main() -> None:
         en_text = file.read()
 
     tokens = tokenize(de_text)
-    print("Токены:", tokens)
+    print("Tokens:", tokens)
 
     clean_tokens = remove_stop_words(tokens, stopwords)
-    print("Токены без стоп-слов:", clean_tokens)
+    print("Tokens without stop-words:", clean_tokens)
 
     freq_dict = calculate_frequencies(clean_tokens)
-    print("Частотный словарь:", freq_dict)
+    print("Frequency dictionary:", freq_dict)
 
     top_7 = get_top_n_words(freq_dict, 7)
-    print("Топ-7 популярных слов текста:", top_7)
+    print("Top-7 words from the text:", top_7)
 
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
     unknown_profile = create_language_profile("unknown", unknown_text, stopwords)
 
-    print("de_profile валиден:", check_profile(de_profile))
-    print("en_profile валиден:", check_profile(en_profile))
-    print("unknown_profile валиден:", check_profile(unknown_profile))
+    print("de_profile is valid:", check_profile(de_profile))
+    print("en_profile is valid:", check_profile(en_profile))
+    print("unknown_profile is valid:", check_profile(unknown_profile))
 
     if de_profile is None or en_profile is None or unknown_profile is None:
-        print("Ошибка")
+        print("Error")
         return
 
     detected_language = detect_language_by_top_n(
         unknown_profile, de_profile, en_profile, 15
     )
-    print("Язык:", detected_language)
+    print("Language:", detected_language)
 
     assert result, "Detection result is None"
 
