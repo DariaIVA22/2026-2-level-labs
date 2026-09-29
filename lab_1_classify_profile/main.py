@@ -195,38 +195,6 @@ def check_profile(profile: ProfileType) -> bool:
 
     return True
 
-    if (
-        not isinstance(profile, tuple)
-        or len(profile) != 3
-    ):
-        return False
-
-    language, frequencies, n_words = profile
-
-    if (
-        not isinstance(language, str)
-        or not isinstance(frequencies, dict)
-    ):
-        return False
-
-    for key, value in frequencies.items():
-        if (
-            not isinstance(key, str)
-            or isinstance(value, bool)
-            or not isinstance(value, (int, float))
-        ):
-            return False
-
-
-    if (
-        isinstance(n_words, bool)
-        or not isinstance(n_words, int)
-        or n_words < 0
-    ):
-        return False
-
-
-    return True
 
 def compare_profiles_by_top_n(
     unknown_profile: ProfileType, profile_to_compare: ProfileType, top_n: int
@@ -314,21 +282,6 @@ def detect_language_by_top_n(
 
     return sorted_list[0]
 
-
-    distance_1 = compare_profiles_by_top_n(unknown_profile, profile_1, top_n)
-    distance_2 = compare_profiles_by_top_n(unknown_profile, profile_2, top_n)
-
-    if distance_1 is None or distance_2 is None:
-        return None
-
-    language_1 = profile_1[0]
-    language_2 = profile_2[0]
-
-    if distance_1 > distance_2:
-        return language_1
-    if distance_2 > distance_1:
-        return language_2
-    return min(language_1, language_2)
 
 # Mark 8
 
