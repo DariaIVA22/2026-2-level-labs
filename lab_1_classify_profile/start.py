@@ -33,13 +33,11 @@ def main() -> None:
 
     result = None
 
-    tokenized_text = tokenize(de_text)
-    if tokenized_text is None:
-        return None
+    tokens = tokenize(de_text)
+    print("Токены:", tokens)
 
-    text_without_stopwords = remove_stop_words(tokenized_text, stopwords)
-    if text_without_stopwords is None:
-        return None
+    clean_tokens = remove_stop_words(tokens, stopwords)
+    print("Токены без стоп-слов:", clean_tokens)
 
     calculated_frequencies = calculate_frequencies(text_without_stopwords)
 
