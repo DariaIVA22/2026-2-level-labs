@@ -76,20 +76,17 @@ def calculate_frequencies(tokens: Sequence[str]) -> dict[str, float] | None:
     """
     if not isinstance(tokens, (list, tuple)):
         return None
-    if len(tokens) == 0:
-        return {}
-    for token in tokens:
-        if not isinstance(token, str):
+
+    for element in tokens:
+        if not isinstance(element, str):
             return None
 
-    total = len(tokens)
-    freq_dict: dict[str, float] = {}
-    for token in tokens:
-        freq_dict[token] = freq_dict.get(token, 0) + 1
+    frequency = {}
+    overall_words = len(tokens)
+    for element in tokens:
+        frequency[element] = frequency.get(element, 0.0) + 1.0 / overall_words
 
-    for token in freq_dict:
-        freq_dict[token] /= total
-    return freq_dict
+    return frequency
 
 
 def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | None:
@@ -104,17 +101,24 @@ def get_top_n_words(freq_dict: dict[str, float], top_n: int) -> Sequence[str] | 
         Sequence[str] | None: Sequence of the most common words.
         Returns None in case of incorrect input types or non-positive top_n.
     """
-    if not isinstance(freq_dict, dict):
+    if not all([isinstance(freq_dict, dict),
+                isinstance(top_n, int)]):
         return None
-    if not isinstance(top_n, int) or isinstance(top_n, bool):
-        return None
+
     if top_n <= 0:
         return None
+
     for key, value in freq_dict.items():
-        if not isinstance(key, str) or not isinstance(value, (int, float)):
+        if not all([isinstance(key, str),
+                isinstance(value, float)]):
             return None
-    sorted_words = sorted(freq_dict, key=lambda word: (-freq_dict[word], word))
-    return sorted_words[:top_n]
+
+    freq_tuples = list(freq_dict.items())
+    sorted_freq_tuples = sorted(freq_tuples, key=lambda x: (-x[1], x[0]))
+    sorted_freq_list = list(sorted_freq_tuples[:top_n])
+    sorted_list = [element[0] for element in sorted_freq_list]
+
+    return sorted_list
 
 # Mark 6.
 
@@ -286,9 +290,7 @@ def calculate_mse(predicted: Sequence[float], actual: Sequence[float]) -> float 
     """
     Calculates mean squared error between predicted and actual values.
 
-    Args:if (
-        not isinstance(profile, tuple)
-        or len(profile) != 3
+    Args:
         predicted (Sequence[float]): Sequence of predicted values
         actual (Sequence[float]): Sequence of actual values
 
