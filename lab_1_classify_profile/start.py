@@ -1,19 +1,13 @@
 """
 Language detection starter.
 """
-
-# pylint: disable=unused-variable, duplicate-code, too-many-return-statements
 from lab_1_classify_profile.main import (
     calculate_frequencies,
-    collect_profiles,
     create_language_profile,
-    detect_language_advanced,
     detect_language_by_mse,
     detect_language_by_top_n,
     get_top_n_words,
-    print_report,
     remove_stop_words,
-    save_profile,
     tokenize,
 )
 
@@ -34,50 +28,24 @@ def main() -> None:
     result = None
 
     tokens = tokenize(de_text)
+    assert tokens is not None
     print("Tokens:", tokens)
+    assert freq_dict is not None
+    print("Frequency dictionary:", freq_dict)
 
-    clean_tokens = remove_stop_words(tokens, stopwords)
-    print("Tokens without stop-words:", clean_tokens)
+    top_7 = get_top_n_words(freq_dict, 7)
+    assert top_7 is not None
+    print("Top-7 words:", top_7)
+    result = get_top_n_words(freq_dict, 7)
+    assert result is not None
+    print("Top-7 words:", result)
 
-    calculated_frequencies = calculate_frequencies(clean_tokens)
-
-    if calculated_frequencies is None:
-        return None
-
-    unk_profile = create_language_profile("unknown", unknown_text, stopwords)
     de_profile = create_language_profile("de", de_text, stopwords)
     en_profile = create_language_profile("en", en_text, stopwords)
-
-    if (unk_profile is None
-        or de_profile is None
-        or en_profile is None):
-        return None
-
-    print(get_top_n_words(calculated_frequencies, 7))
-    print(detect_language_by_top_n(unk_profile, en_profile, de_profile, 15))
-    result = detect_language_by_mse(unk_profile, en_profile, de_profile)
-
-    save_profile(unk_profile, 'lab_1_classify_profile/assets/profiles')
-    save_profile(de_profile, 'lab_1_classify_profile/assets/profiles')
-    save_profile(en_profile, 'lab_1_classify_profile/assets/profiles')
-
-    list_of_paths = ['lab_1_classify_profile/assets/profiles/la.json',
-                     'lab_1_classify_profile/assets/profiles/de.json',
-                     'lab_1_classify_profile/assets/profiles/en.json']
-    collected_profiles = collect_profiles(list_of_paths)
-
-    if collected_profiles is None:
-        return None
-
-    advanced_detection = detect_language_advanced(unk_profile, collected_profiles, 15)
-
-    if advanced_detection is None:
-        return None
-
-    print_report(unk_profile, advanced_detection, 15)
+    assert detected_language_mse is not None
+    print("Language by MSE:", detected_language_mse)
 
     assert result, "Detection result is None"
-    return None
 
 
 if __name__ == "__main__":
