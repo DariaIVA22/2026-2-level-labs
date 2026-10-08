@@ -64,6 +64,25 @@ def collect_frequencies(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (not isinstance(text, str) or
+        (start_of_word is not None and not isinstance(start_of_word, str)) or
+        (not isinstance(end_of_word, str))
+    ):
+        return None
+
+    freq_dict = {}
+
+    for raw_word in text.split():
+        word = prepare_word(raw_word, start_of_word, end_of_word)
+        if word is None:
+            return None
+        freq_dict[word] = freq_dict.get(word, 0) + 1
+
+    return freq_dict
+
+
+
+
 
 
 def count_tokens_pairs(
