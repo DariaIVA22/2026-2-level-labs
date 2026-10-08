@@ -101,6 +101,18 @@ def count_tokens_pairs(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+
+    pair_dict = {}
+    for key in word_frequencies.keys():
+        for i in range(len(key)-1):
+            counter = word_frequencies[key]
+            pair_dict[tuple([key[i], key[i+1]])] = pair_dict.get(tuple([key[i], key[i+1]]), 0) + counter
+    return pair_dict
+
+
+
 
 
 def merge_tokens(
