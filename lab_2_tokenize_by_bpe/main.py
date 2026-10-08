@@ -132,6 +132,27 @@ def merge_tokens(
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(word_frequencies, dict):
+            return None
+    if not isinstance(pair, tuple):
+            return None
+
+    merged_dict = {}
+    for key, value in word_frequencies.items():
+        new_key = []
+        i = 0
+        while i < len(key):
+            if i < len(key) - 1 and key[i] == pair[0] and key[i + 1] == pair[1]:
+                new_key.append(key[i] + key[i + 1])
+                i += 2
+            else:
+                new_key.append(key[i])
+                i += 1
+
+        new_key_tuple = tuple(new_key)
+        merged_dict[new_key_tuple] = merged_dict.get(new_key_tuple, 0) + value
+
+    return merged_dict
 
 
 def train(
