@@ -108,7 +108,7 @@ def count_tokens_pairs(
     for key in word_frequencies.keys():
         for i in range(len(key)-1):
             counter = word_frequencies[key]
-            pair_dict[tuple([key[i], key[i+1]])] = pair_dict.get(tuple([key[i], key[i+1]]), 0) + counter
+            pair_dict[(key[i], key[i+1])] = pair_dict.get((key[i], key[i+1]), 0) + counter
     return pair_dict
 
 
