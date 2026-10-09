@@ -133,9 +133,9 @@ def merge_tokens(
     In case of corrupt input arguments, None is returned
     """
     if not isinstance(word_frequencies, dict):
-            return None
+        return None
     if not isinstance(pair, tuple):
-            return None
+        return None
 
     merged_dict = {}
     for key, value in word_frequencies.items():
