@@ -31,14 +31,12 @@ def prepare_word(
     ):
         return None
 
+    start = ()
+    end = ()
     if start_of_word is not None:
         start = (start_of_word,)
-    else:
-        start = ()
     if end_of_word is not None:
         end = (end_of_word,)
-    else:
-        end = ()
 
     return start + tuple(raw_word) + end
 
@@ -79,8 +77,6 @@ def collect_frequencies(
         freq_dict[word] = freq_dict.get(word, 0) + 1
 
     return freq_dict
-
-
 
 
 
