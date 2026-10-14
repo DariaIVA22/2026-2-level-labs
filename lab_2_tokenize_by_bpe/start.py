@@ -3,7 +3,9 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-
+from lab_2_tokenize_by_bpe.main import (
+    collect_frequencies
+)
 
 def main() -> None:
     """
@@ -15,8 +17,18 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
+
     result = None
-    assert result, "Translation not working"
+
+    word_frequencies = collect_frequencies(text, None, "</s>")
+    if word_frequencies is None:
+        return None
+
+    result = word_frequencies
+
+    assert result, "Collect frequencies result is None"
+    return None
+
 
 
 if __name__ == "__main__":
