@@ -33,6 +33,7 @@ def prepare_word(
 
     start = ()
     end = ()
+
     if start_of_word is not None:
         start = (start_of_word,)
     if end_of_word is not None:
