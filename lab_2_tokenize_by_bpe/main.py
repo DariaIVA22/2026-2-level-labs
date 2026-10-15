@@ -104,7 +104,10 @@ def count_tokens_pairs(
     for key in word_frequencies.keys():
         for i in range(len(key)-1):
             counter = word_frequencies[key]
-            pair_dict[(key[i], key[i+1])] = pair_dict.get((key[i], key[i+1]), 0) + counter
+            first = key[i]
+            second = key[i + 1]
+            pair = (first, second)
+            pair_dict[pair] = pair_dict.get(pair, 0) + counter
     return pair_dict
 
 
@@ -141,9 +144,9 @@ def merge_tokens(
             if i < len(key) - 1 and key[i] == pair[0] and key[i + 1] == pair[1]:
                 new_key.append(key[i] + key[i + 1])
                 i += 2
-            else:
-                new_key.append(key[i])
-                i += 1
+                continue
+            new_key.append(key[i])
+            i += 1
 
         new_key_tuple = tuple(new_key)
         merged_dict[new_key_tuple] = merged_dict.get(new_key_tuple, 0) + value
