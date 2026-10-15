@@ -4,7 +4,9 @@ BPE Tokenizer starter
 
 # pylint:disable=too-many-locals, unused-variable
 from lab_2_tokenize_by_bpe.main import (
-    collect_frequencies
+    collect_frequencies,
+    count_tokens_pairs,
+    train
 )
 
 def main() -> None:
@@ -27,7 +29,19 @@ def main() -> None:
     result = word_frequencies
 
     assert result, "Collect frequencies result is None"
-    return None
+
+    pairs = count_tokens_pairs(word_frequencies)
+    if pairs is None:
+        return None
+
+    trained = train(word_frequencies, 100)
+    if trained is None:
+        return None
+    print(f"unique words(step 5: {len(trained)}")
+
+    result = trained
+    assert result, "Training result is None"
+
 
 
 
