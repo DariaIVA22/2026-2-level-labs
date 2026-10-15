@@ -173,7 +173,51 @@ def train(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if not isinstance(word_frequencies, dict):
+        return None
+    if not isinstance(num_merges, int) or num_merges < 0:
+        return None
 
+    for i in range(num_merges):
+        pairs = count_tokens_pairs(word_frequencies)
+        if pairs is None:
+            return None
+        if not pairs:
+            break
+
+        best_pair = None
+        best_count = -1
+        best_len = -1
+        best_merged = None
+
+        for pair, count in pairs.items():
+            merged = pair[0] + pair[1]
+            merged_len = len(merged)
+
+            is_better = False
+            if count > best_count:
+                is_better = True
+            elif count == best_count:
+                if merged_len > best_len:
+                    is_better = True
+                elif merged_len == best_len:
+                    if best_merged is None or merged < best_merged:
+                        is_better = True
+
+            if is_better:
+                best_pair = pair
+                best_count = count
+                best_len = merged_len
+                best_merged = merged
+
+        if best_pair is None:
+            break
+
+        word_frequencies = merge_tokens(word_frequencies, best_pair)
+        if word_frequencies is None:
+            return None
+
+    return word_frequencies
 
 def get_vocabulary(
     word_frequencies: dict[tuple[str, ...], int], unknown_token: str
