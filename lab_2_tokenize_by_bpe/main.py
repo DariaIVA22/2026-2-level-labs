@@ -186,9 +186,8 @@ def train(
         if not pairs:
             break
 
-        best_pair = min(
-        pairs,
-        key=lambda p: (-pairs[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
+        best_pair = min(pairs,
+        key=lambda p, pairs=pairs: (-pairs[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
         )
 
         word_frequencies = merge_tokens(word_frequencies, best_pair)
@@ -213,12 +212,13 @@ def get_vocabulary(
 
     In case of corrupt input arguments, None is returned
     """
-    if (not isinstance(word_frequencies, dict)
+    if (
+        not isinstance(word_frequencies, dict)
         or not isinstance(unknown_token, str)
     ):
         return None
 
-    tokens = set()
+    tokens = {unknown_token}
     for word in word_frequencies:
         if not isinstance(word, tuple):
             return None
@@ -231,22 +231,12 @@ def get_vocabulary(
 
     sorted_tokens = sorted(tokens, key=lambda t: (-len(t), t))
 
-    vocabulary = {unknown_token: 0}
-    identifier = 1
-
-    if "</s>" in sorted_tokens:
-        vocabulary["</s>"] = identifier
-        identifier += 1
-
-    for token in sorted_tokens:
-        if token == "</s>":
-            continue
-        if token == unknown_token:
-            continue
+    vocabulary: dict[str, int] = {}
+    for identifier, token in enumerate(sorted_tokens):
         vocabulary[token] = identifier
-        identifier += 1
 
     return vocabulary
+
 
 
 def decode(
@@ -268,22 +258,26 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
-    if not isinstance(encoded_text, Sequence) or isinstance(encoded_text, str):
-        return None
-    if not isinstance(vocabulary, dict):
-        return None
-    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+    if (
+        not isinstance(encoded_text, Sequence)
+        or isinstance(encoded_text, str)
+        or isinstance(encoded_text, bool)
+        or not encoded_text
+        or not isinstance(vocabulary, dict)
+        or not vocabulary
+        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
+    ):
         return None
 
     reverse: dict[int, str] = {}
     for token, identifier in vocabulary.items():
-        if not isinstance(token, str) or not isinstance(identifier, int):
+        if not isinstance(token, str) or not isinstance(identifier, int) or isinstance(identifier, bool):
             return None
         reverse[identifier] = token
 
     parts: list[str] = []
     for identifier in encoded_text:
-        if not isinstance(identifier, int):
+        if not isinstance(identifier, int) or isinstance(identifier, bool):
             return None
         if identifier not in reverse:
             return None
