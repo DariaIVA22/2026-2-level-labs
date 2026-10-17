@@ -41,6 +41,7 @@ def main() -> None:
 
     result = trained
     assert result, "Training result is None"
+    return None
 
 
 
