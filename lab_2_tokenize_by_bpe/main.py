@@ -6,6 +6,7 @@ BPE and machine translation evaluation
 
 # pylint:disable=unused-argument
 from typing import Sequence
+import json
 
 
 def prepare_word(
@@ -259,16 +260,15 @@ def decode(
     In case of corrupt input arguments, None is returned
     """
     if (
-        isinstance(encoded_text, (str, bool))
-        or not isinstance(encoded_text, Sequence)
-        or not encoded_text
+    isinstance(encoded_text, (str, bool))
+    or not isinstance(encoded_text, Sequence)
+    or not isinstance(vocabulary, dict)
+    or not vocabulary
+    or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
     ):
         return None
 
-    if not isinstance(vocabulary, dict) or not vocabulary:
-        return None
-
-    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
+    if not encoded_text:
         return None
 
     reverse: dict[int, str] = {}
@@ -367,6 +367,27 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
 
     In case of corrupt input arguments, None is returned
     """
+    if not isinstance(vocab_path, str) or not vocab_path:
+        return None
+
+    try:
+        with open(vocab_path, "r", encoding="utf-8") as file:
+            data = json.load(file)
+    except (OSError, ValueError):
+        return None
+
+    if not isinstance(data, dict) or not data:
+        return None
+
+    vocabulary: dict[str, int] = {}
+    for token, identifier in data.items():
+        if not isinstance(token, str) or not token:
+            return None
+        if not isinstance(identifier, int) or isinstance(identifier, bool):
+            return None
+        vocabulary[token] = identifier
+
+    return vocabulary
 
 
 def encode(
