@@ -413,6 +413,30 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
+    if (
+        not isinstance(original_text, str)
+        or not isinstance(vocabulary, dict)
+        or not isinstance(unknown_token, str)
+        or (start_of_word_token is not None and not isinstance(start_of_word_token, str))
+        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
+    ):
+        return None
+
+    result: list[int] = []
+
+    for raw_word in original_text.split():
+        prepared = prepare_word(raw_word, start_of_word_token, end_of_word_token)
+        if prepared is None:
+            return None
+
+        ids = tokenize_word(prepared, vocabulary, end_of_word_token, unknown_token)
+        if ids is None:
+            return None
+
+        result.extend(ids)
+
+    return result
+
 
 
 def collect_ngrams(text: str, order: int) -> list[tuple[str, ...]] | None:
