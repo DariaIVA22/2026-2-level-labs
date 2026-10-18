@@ -259,19 +259,23 @@ def decode(
     In case of corrupt input arguments, None is returned
     """
     if (
-        not isinstance(encoded_text, Sequence)
-        or isinstance(encoded_text, str)
-        or isinstance(encoded_text, bool)
+        isinstance(encoded_text, (str, bool))
+        or not isinstance(encoded_text, Sequence)
         or not encoded_text
-        or not isinstance(vocabulary, dict)
-        or not vocabulary
-        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
     ):
+        return None
+
+    if not isinstance(vocabulary, dict) or not vocabulary:
+        return None
+
+    if end_of_word_token is not None and not isinstance(end_of_word_token, str):
         return None
 
     reverse: dict[int, str] = {}
     for token, identifier in vocabulary.items():
-        if not isinstance(token, str) or not isinstance(identifier, int) or isinstance(identifier, bool):
+        if (not isinstance(token, str)
+            or not isinstance(identifier, int)
+            or isinstance(identifier, bool)):
             return None
         reverse[identifier] = token
 
@@ -307,6 +311,48 @@ def tokenize_word(
 
     In case of corrupt input arguments, None is returned
     """
+    if (
+        not isinstance(word, tuple)
+        or not isinstance(vocabulary, dict)
+        or not isinstance(unknown_token, str)
+        or (end_of_word is not None and not isinstance(end_of_word, str))
+    ):
+        return None
+
+    if unknown_token not in vocabulary:
+        return None
+
+    tokens = [str(t) for t in word]
+
+    candidates = sorted(
+        (t for t in vocabulary if t not in (unknown_token, end_of_word)),
+        key=lambda t: (-len(t), t),
+    )
+
+    for cand in candidates:
+        new_tokens: list[str] = []
+        i = 0
+        while i < len(tokens):
+            acc = ""
+            j = i
+            while j < len(tokens) and len(acc) < len(cand):
+                acc += tokens[j]
+                j += 1
+            if acc == cand:
+                new_tokens.append(cand)
+                i = j
+            else:
+                new_tokens.append(tokens[i])
+                i += 1
+        tokens = new_tokens
+
+    result: list[int] = []
+    for seg in tokens:
+        if seg in vocabulary:
+            result.append(vocabulary[seg])
+        else:
+            result.extend(vocabulary[unknown_token] for _ in seg)
+    return result
 
 
 def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
