@@ -17,7 +17,6 @@ def main() -> None:
     """
     Launches an implementation
     """
-    result = None
 
     with open("lab_2_tokenize_by_bpe/assets/text.txt", "r", encoding="utf-8") as text_file:
         text = text_file.read()

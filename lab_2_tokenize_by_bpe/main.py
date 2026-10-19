@@ -237,7 +237,7 @@ def get_vocabulary(
 
     sorted_tokens = sorted(tokens, key=lambda t: (-len(t), t))
 
-    vocabulary: dict[str, int] = {}
+    vocabulary = {}
     for identifier, token in enumerate(sorted_tokens):
         vocabulary[token] = identifier
 
@@ -275,7 +275,7 @@ def decode(
     if bad_text or bad_vocab or bad_end:
         return None
 
-    reverse: dict[int, str] = {}
+    reverse = {}
     for token, identifier in vocabulary.items():
         if (not isinstance(token, str)
             or not isinstance(identifier, int)
@@ -283,7 +283,7 @@ def decode(
             return None
         reverse[identifier] = token
 
-    parts: list[str] = []
+    parts = []
     for identifier in encoded_text:
         if not isinstance(identifier, int) or isinstance(identifier, bool):
             return None
@@ -350,7 +350,7 @@ def tokenize_word(
                 i += 1
         tokens = new_tokens
 
-    result: list[int] = []
+    result = []
     for seg in tokens:
         if seg in vocabulary:
             result.append(vocabulary[seg])
@@ -374,16 +374,13 @@ def load_vocabulary(vocab_path: str) -> dict[str, int] | None:
     if not isinstance(vocab_path, str) or not vocab_path:
         return None
 
-    try:
-        with open(vocab_path, "r", encoding="utf-8") as file:
-            data = json.load(file)
-    except (OSError, ValueError):
-        return None
+    with open(vocab_path, "r", encoding="utf-8") as file:
+        data = json.load(file)
 
     if not isinstance(data, dict) or not data:
         return None
 
-    vocabulary: dict[str, int] = {}
+    vocabulary = {}
     for token, identifier in data.items():
         if not isinstance(token, str) or not token:
             return None
