@@ -32,15 +32,14 @@ def prepare_word(
     ):
         return None
 
-    start = ()
-    end = ()
-
+    result = []
     if start_of_word is not None:
-        start = (start_of_word,)
+        result.append(start_of_word)
+    result.extend(raw_word)
     if end_of_word is not None:
-        end = (end_of_word,)
+        result.append(end_of_word)
 
-    return start + tuple(raw_word) + end
+    return tuple(result)
 
 
 
@@ -188,7 +187,7 @@ def train(
             break
 
         best_pair = min(pairs,
-        key=lambda p, pairs=pairs: (-pairs[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
+        key=lambda p: (-pairs[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
         )
 
         word_frequencies = merge_tokens(word_frequencies, best_pair)
@@ -414,13 +413,14 @@ def encode(
     """
     bad_args = (
         not isinstance(original_text, str)
-        or not isinstance(vocabulary, dict)
         or not isinstance(unknown_token, str)
     )
     bad_start = start_of_word_token is not None and not isinstance(start_of_word_token, str)
     bad_end = end_of_word_token is not None and not isinstance(end_of_word_token, str)
 
     if bad_args or bad_start or bad_end:
+        return None
+    if not isinstance(vocabulary, dict):
         return None
 
     result: list[int] = []
