@@ -22,28 +22,26 @@ def main() -> None:
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
 
-    result = None
-
     word_frequencies = collect_frequencies(text, None, "</s>")
     if word_frequencies is None:
-        return None
+        return
     print(f'Unique words before train: {len(word_frequencies)}')
 
     trained = train(word_frequencies, 100)
     if trained is None:
-        return None
+        return
     print(f"Unique words after train: {len(trained)}")
 
     vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
     if vocabulary is None:
-        return None
+        return
     print(f"Vocabulary size: {len(vocabulary)}")
 
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as f:
         secret_encoded = [int(x) for x in f.read().split()]
         decoded = decode(secret_encoded, vocabulary, "</s>")
     if decoded is None:
-        return None
+        return
     print("Decoded secret:", decoded)
 
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
@@ -59,7 +57,7 @@ def main() -> None:
         unknown_token="<unk>",
     )
     if encoded is None:
-        return None
+        return
 
     reference = [int(x) for x in ru_encoded_raw.split()]
 

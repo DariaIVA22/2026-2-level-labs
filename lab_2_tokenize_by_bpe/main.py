@@ -265,10 +265,8 @@ def decode(
     or not isinstance(vocabulary, dict)
     or not vocabulary
     or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
+    or not encoded_text
     ):
-        return None
-
-    if not encoded_text:
         return None
 
     reverse: dict[int, str] = {}
@@ -413,13 +411,15 @@ def encode(
     In case of corrupt input arguments or functions used return None,
     None is returned
     """
-    if (
+    bad_args = (
         not isinstance(original_text, str)
         or not isinstance(vocabulary, dict)
         or not isinstance(unknown_token, str)
-        or (start_of_word_token is not None and not isinstance(start_of_word_token, str))
-        or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
-    ):
+    )
+    bad_start = start_of_word_token is not None and not isinstance(start_of_word_token, str)
+    bad_end = end_of_word_token is not None and not isinstance(end_of_word_token, str)
+
+    if bad_args or bad_start or bad_end:
         return None
 
     result: list[int] = []
