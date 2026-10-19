@@ -429,7 +429,7 @@ def encode(
     if not isinstance(vocabulary, dict):
         return None
 
-    result: list[int] = []
+    result = []
 
     for raw_word in original_text.split():
         prepared = prepare_word(raw_word, start_of_word_token, end_of_word_token)
