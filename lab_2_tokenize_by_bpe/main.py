@@ -180,14 +180,14 @@ def train(
         return None
 
     for _ in range(num_merges):
-        pairs = count_tokens_pairs(word_frequencies)
-        if pairs is None:
+        counter = count_tokens_pairs(word_frequencies)
+        if counter is None:
             return None
-        if not pairs:
+        if not counter:
             break
 
-        best_pair = min(pairs,
-        key=lambda p: (-pairs[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
+        best_pair = min(counter,
+        key=lambda p: (-counter[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
         )
 
         word_frequencies = merge_tokens(word_frequencies, best_pair)
