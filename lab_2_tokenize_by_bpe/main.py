@@ -259,14 +259,15 @@ def decode(
 
     In case of corrupt input arguments, None is returned
     """
-    if (
-    isinstance(encoded_text, (str, bool))
-    or not isinstance(encoded_text, Sequence)
-    or not isinstance(vocabulary, dict)
-    or not vocabulary
-    or (end_of_word_token is not None and not isinstance(end_of_word_token, str))
-    or not encoded_text
-    ):
+    bad_text = (
+        isinstance(encoded_text, (str, bool))
+        or not isinstance(encoded_text, Sequence)
+        or not encoded_text
+    )
+    bad_vocab = not isinstance(vocabulary, dict) or not vocabulary
+    bad_end = end_of_word_token is not None and not isinstance(end_of_word_token, str)
+
+    if bad_text or bad_vocab or bad_end:
         return None
 
     reverse: dict[int, str] = {}
