@@ -3,13 +3,12 @@ BPE Tokenizer starter
 """
 
 # pylint:disable=too-many-locals, unused-variable
-import json
 from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
     encode,
     load_vocabulary,
-    train
+    train,
 )
 
 
