@@ -7,6 +7,7 @@ from lab_2_tokenize_by_bpe.main import (
     collect_frequencies,
     decode,
     encode,
+    get_vocabulary,
     load_vocabulary,
     train,
 )
@@ -23,10 +24,12 @@ def main() -> None:
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
 
+    result = None
+
     word_frequencies = collect_frequencies(text, None, "</s>")
     if word_frequencies is None:
         return
-    print(f'Unique words before train: {len(word_frequencies)}')
+    print(f'Frequency of words before train: {len(word_frequencies)}')
 
     trained = train(word_frequencies, 100)
     if trained is None:
