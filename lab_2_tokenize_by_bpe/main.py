@@ -186,9 +186,15 @@ def train(
         if not counter:
             break
 
-        best_pair = min(counter,
-        key=lambda p: (-counter[p], -(len(p[0]) + len(p[1])), p[0] + p[1]),
+        sorted_pairs = sorted(
+            counter.items(),
+            key=lambda item: (
+                -item[1],
+                -(len(item[0][0]) + len(item[0][1])),
+                item[0][0] + item[0][1],
+            ),
         )
+        best_pair = sorted_pairs[0][0]
 
         word_frequencies = merge_tokens(word_frequencies, best_pair)
         if word_frequencies is None:
