@@ -54,13 +54,16 @@ def main() -> None:
 
     encoded = encode(ru_text, vocabulary, "▁", None, "<unk>")
     assert encoded, "encode failed"
+    print("MY encoded text:", encoded)
 
     compare_len = min(20, len(encoded), len(ru_expected))
     is_match = all(encoded[i] == ru_expected[i] for i in range(compare_len))
-    print("Result of matching:", is_match)
+    print("Result of matching encoded with expected:", is_match)
 
     result = encoded
     assert result, "Translation not working"
+
+    print("final mark: 8")
 
 
 if __name__ == "__main__":
