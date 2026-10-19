@@ -23,57 +23,53 @@ def main() -> None:
         text_reference_translation = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/en_encoded.txt", "r", encoding="utf-8") as text_file:
         translation_encoded_raw = text_file.read()
-
-    result = None
-
-    word_frequencies = collect_frequencies(text, None, "</s>")
-    if word_frequencies is None:
-        return
-    print(f'Frequency of words before train: {len(word_frequencies)}')
-
-    trained = train(word_frequencies, 100)
-    if trained is None:
-        return
-    print(f"Unique words after train: {len(trained)}")
-
-    vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
-    if vocabulary is None:
-        return
-    print(f"Vocabulary size: {len(vocabulary)}")
-
-    trained_vocab = get_vocabulary(trained, "<unk>")
-    if trained_vocab is None:
-        return
-    print(f"Trained vocabulary size: {len(trained_vocab)}")
-
-    with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as f:
-        secret_encoded = [int(x) for x in f.read().split()]
-        decoded = decode(secret_encoded, vocabulary, "</s>")
-    if decoded is None:
-        return
-    print("Decoded secret:", decoded)
-
+    with open(
+        "lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt",
+        "r",
+        encoding="utf-8",
+    ) as secret_file:
+        secret_text = [int(x) for x in secret_file.read().split()]
     with open("lab_2_tokenize_by_bpe/assets/ru_raw.txt", "r", encoding="utf-8") as text_file:
         ru_text = text_file.read()
     with open("lab_2_tokenize_by_bpe/assets/ru_encoded.txt", "r", encoding="utf-8") as text_file:
-        ru_encoded_raw = text_file.read()
+        ru_expected = [int(x) for x in text_file.read().split()]
+
+    word_frequencies = collect_frequencies(text, None, "</s>")
+    assert word_frequencies, "collect_frequencies failed"
+    print(f"Frequency of words before train: {len(word_frequencies)}")
+
+    trained = train(word_frequencies, 100)
+    assert trained, "train failed"
+    print(f"Unique words after train: {len(trained)}")
+
+    trained_vocab = get_vocabulary(trained, "<unk>")
+    assert trained_vocab, "get_vocabulary failed"
+    print(f"Trained vocabulary size: {len(trained_vocab)}")
+
+    decoded = decode(secret_text, trained_vocab, "</s>")
+    assert decoded, "decode failed"
+    print(f"Decoded secret: {decoded}")
+
+    vocabulary = load_vocabulary("lab_2_tokenize_by_bpe/assets/vocab.json")
+    assert vocabulary, "load_vocabulary failed"
+    print(f"Vocabulary size: {len(vocabulary)}")
 
     encoded = encode(
         ru_text,
         vocabulary,
-        start_of_word_token="\u2581",
+        start_of_word_token="▁",
         end_of_word_token=None,
         unknown_token="<unk>",
     )
-    if encoded is None:
-        return
-
-    reference = [int(x) for x in ru_encoded_raw.split()]
+    assert encoded, "encode failed"
 
     print("First 20 encoded:  ", encoded[:20])
-    print("First 20 reference:", reference[:20])
-    print("First 20 match:", encoded[:20] == reference[:20])
-    print("Full match:", encoded == reference)
+    print("First 20 reference:", ru_expected[:20])
+    print("First 20 match:", encoded[:20] == ru_expected[:20])
+    print("Full match:", encoded == ru_expected)
+
+    result = encoded
+    assert result, "Translation not working"
 
 
 if __name__ == "__main__":
