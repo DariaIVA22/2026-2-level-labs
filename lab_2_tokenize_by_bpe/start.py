@@ -41,6 +41,11 @@ def main() -> None:
         return
     print(f"Vocabulary size: {len(vocabulary)}")
 
+    trained_vocab = get_vocabulary(trained, "<unk>")
+    if trained_vocab is None:
+        return
+    print(f"Trained vocabulary size: {len(trained_vocab)}")
+
     with open("lab_2_tokenize_by_bpe/assets/secrets/secret_1.txt", "r", encoding="utf-8") as f:
         secret_encoded = [int(x) for x in f.read().split()]
         decoded = decode(secret_encoded, vocabulary, "</s>")
