@@ -43,6 +43,31 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(text, str):
+            return None
+
+        eow = self._end_of_word_token
+        tokens = []
+        current_word = []
+
+        for char in text.lower():
+            if char.isalpha():
+                current_word.append(char)
+            else:
+                if current_word:
+                    tokens.extend(current_word)
+                    tokens.append(eow)
+                    current_word = []
+
+        if current_word:
+            tokens.extend(current_word)
+        elif tokens and tokens[-1] != eow:
+            tokens.append(eow)
+
+        if not tokens:
+            return None
+
+        return tuple(tokens)
 
     def get_id(self, element: str) -> int | None:
         """
@@ -57,6 +82,10 @@ class TextProcessor:
         In case of corrupt input arguments or arguments not included in storage,
         None is returned
         """
+        if not isinstance(element, str) or len(element) != 1:
+            return None
+
+        return self._storage.get(element)
 
     def get_end_of_word_token(self) -> str:  # type: ignore[empty-body]
         """
@@ -78,6 +107,14 @@ class TextProcessor:
 
         In case of corrupt input arguments or arguments not included in storage, None is returned
         """
+        if not isinstance(element_id, int) or isinstance(element_id, bool):
+            return None
+
+        for token, token_id in self._storage.items():
+            if token_id == element_id:
+                return token
+
+        return None
 
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
@@ -106,6 +143,13 @@ class TextProcessor:
         In case of corrupt input arguments or invalid argument length,
         an element is not added to storage
         """
+        if not isinstance(element, str) or len(element) != 1:
+            return
+
+        if element in self._storage:
+            return
+
+        self._storage[element] = len(self._storage)
 
     def decode(self, encoded_corpus: tuple[int, ...]) -> str | None:
         """
