@@ -114,8 +114,6 @@ class TextProcessor:
             if token_id == element_id:
                 return token
 
-        return None
-
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
         Encode text.
@@ -207,6 +205,18 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned.
         In case any of methods used return None, None is returned.
         """
+        if not isinstance(corpus, tuple):
+            return None
+
+        decoded_corpus = []
+
+        for i in corpus:
+            token = self.get_token(i)
+            if token is None:
+                return None
+            decoded_corpus.append(token)
+
+        return tuple(decoded_corpus)
 
     def _postprocess_decoded_text(self, decoded_corpus: tuple[str, ...]) -> str | None:
         """
