@@ -53,6 +53,8 @@ class TextProcessor:
         for char in text.lower():
             if char.isalpha():
                 current_word.append(char)
+            elif char == '-':
+                continue
             else:
                 if current_word:
                     tokens.extend(current_word)
@@ -350,6 +352,9 @@ class NGramLanguageModel:
             encoded_corpus (tuple | None): Encoded text
             n_gram_size (int): A size of n-grams to use for language modelling
         """
+        self._encoded_corpus = encoded_corpus
+        self.__n_gram_size = n_gram_size
+        self._n_gram_frequencies = []
 
     def get_n_gram_size(self) -> int:  # type: ignore[empty-body]
         """
@@ -407,6 +412,19 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(encoded_corpus, tuple):
+                    return None
+
+        n = self.__n_gram_size
+
+        if n <= 0 or len(encoded_corpus) < n:
+            return None
+
+        extracted = []
+        for start_position in range(len(encoded_corpus) - n + 1):
+            extracted.append(encoded_corpus[start_position:start_position + n])
+
+        return tuple(extracted)
 
 
 class GreedyTextGenerator:
