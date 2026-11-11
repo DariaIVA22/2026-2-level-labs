@@ -3,7 +3,7 @@ Generation by NGrams starter
 """
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
-from lab_3_generate_by_ngrams.main import TextProcessor
+from lab_3_generate_by_ngrams.main import TextProcessor, NGramLanguageModel
 
 
 def main() -> None:
@@ -19,9 +19,12 @@ def main() -> None:
 
     t = TextProcessor("_")
     encoded_text = t.encode(text)
-    print(f"encoded text: {encoded_text}")
     decoded_text = t.decode(encoded_text)
-    print(f"decoded text: {decoded_text}")
+    n = NGramLanguageModel(encoded_text, 3)
+    build_example =n.build()
+    print(f"build example : {build_example}")
+    freq_example = n._n_gram_frequencies
+    print(f"frequencies example: {freq_example}")
     result = decoded_text
     assert result
 
