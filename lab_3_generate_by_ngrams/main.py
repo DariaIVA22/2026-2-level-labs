@@ -516,9 +516,6 @@ class GreedyTextGenerator:
         if not isinstance(seq_len, int):
             return None
 
-        if not isinstance(prompt, str):
-            return None
-
         if seq_len <= 0:
             return None
 
