@@ -424,6 +424,28 @@ class NGramLanguageModel:
 
         In case of corrupt input arguments, None is returned
         """
+        if not isinstance(sequence, tuple) or not sequence:
+            return None
+        if not all(type(token) is int for token in sequence):
+            return None
+
+        n = self.__n_gram_size
+        context_length = n - 1
+
+        if len(sequence) < context_length:
+            return None
+
+        if context_length == 0:
+            context = ()
+        else:
+            context = sequence[-context_length:]
+
+        result = {}
+        for n_gram, probability in self._n_gram_frequencies.items():
+            if n_gram[:-1] == context:
+                result[n_gram[-1]] = probability
+
+        return result
 
     def _extract_n_grams(
         self, encoded_corpus: tuple[int, ...]
@@ -471,6 +493,8 @@ class GreedyTextGenerator:
             language_model (NGramLanguageModel): A language model to use for text generation
             text_processor (TextProcessor): A TextProcessor instance to handle text processing
         """
+        self._model = language_model
+        self._text_processor = text_processor
 
     def run(self, prompt: str, seq_len: int) -> str | None:
         """
@@ -486,6 +510,35 @@ class GreedyTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(prompt, str):
+            return None
+
+        if not isinstance(seq_len, int):
+            return None
+
+        if not isinstance(prompt, str):
+            return None
+
+        if seq_len <= 0:
+            return None
+
+        encoded_prompt = self._text_processor.encode(prompt)
+        if encoded_prompt is None:
+            return None
+
+        sequence = list(encoded_prompt)
+
+        for _ in range(seq_len):
+            candidates = self._model.generate_next_token(tuple(sequence))
+            if not candidates:
+                break
+
+            best_token = max(candidates, key=lambda tok: (candidates[tok], tok))
+            sequence.append(best_token)
+
+        decoded = self._text_processor.decode(tuple(sequence))
+        return decoded
+
 
 
 class BeamSearcher:
