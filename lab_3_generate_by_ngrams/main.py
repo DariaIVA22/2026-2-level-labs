@@ -145,11 +145,11 @@ class TextProcessor:
         if tokenized_text is None:
             return None
 
-        tokenized_text = list(tokenized_text)
+        tokenized_list = list(tokenized_text)
 
         encoded_text = []
 
-        for i in tokenized_text:
+        for i in tokenized_list:
             self._put(i)
             get_id_text = self.get_id(i)
             if get_id_text is None:
@@ -200,6 +200,8 @@ class TextProcessor:
             return None
 
         preprocessed_text = self._decode(encoded_corpus)
+        if preprocessed_text is None:
+            return None
         postprocessed_text = self._postprocess_decoded_text(preprocessed_text)
 
         return postprocessed_text
@@ -791,7 +793,7 @@ class BeamSearchTextGenerator:
                 return None
             sequence_candidates = pruned
 
-        best_sequence = min(sequence_candidates, key=sequence_candidates.get)
+        best_sequence = min(sequence_candidates, key=lambda seq: sequence_candidates[seq])
         return self._text_processor.decode(best_sequence)
 
     def _get_next_token(
