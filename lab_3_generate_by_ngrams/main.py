@@ -681,26 +681,28 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if (
-            not isinstance(sequence_candidates, dict)
-            or not sequence_candidates
-            or not isinstance(self._beam_width, int)
-            or self._beam_width <= 0
-        ):
+        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
+            return None
+        if not isinstance(self._beam_width, int) or self._beam_width <= 0:
             return None
 
+        valid_candidates = {}
         for seq, penalty in sequence_candidates.items():
             if (
-                not isinstance(seq, tuple)
-                or not seq
-                or not all(isinstance(token, int) and not isinstance(token, bool) for token in seq)
-                or not isinstance(penalty, (int, float))
-                or isinstance(penalty, bool)
+                isinstance(seq, tuple)
+                and seq
+                and all(isinstance(token, int)
+                and not isinstance(token, bool) for token in seq)
+                and isinstance(penalty, (int, float))
+                and not isinstance(penalty, bool)
             ):
-                return None
+                valid_candidates[seq] = penalty
+
+        if not valid_candidates:
+            return None
 
         sorted_items = sorted(
-            sequence_candidates.items(),
+            valid_candidates.items(),
             key=lambda item: (item[1], tuple(-x for x in item[0])),
         )
         top_n = sorted_items[: self._beam_width]
