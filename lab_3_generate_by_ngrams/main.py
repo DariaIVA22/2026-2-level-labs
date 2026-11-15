@@ -523,7 +523,7 @@ class GreedyTextGenerator:
 
         sequence = list(encoded_prompt)
 
-        for i in range(seq_len):
+        for _ in range(seq_len):
             candidates = self._model.generate_next_token(tuple(sequence))
             if not candidates:
                 break
@@ -590,7 +590,7 @@ class BeamSearcher:
         items = candidates.items()
         sorted_candidates = sorted(
             items,
-            key=lambda item: (item[1], item[0]),
+            key=lambda item, items=items: (item[1], item[0]),
             reverse=True,
         )
 
@@ -621,21 +621,24 @@ class BeamSearcher:
         if (
             not isinstance(sequence, tuple)
             or not sequence
-            or not all(isinstance(token, int)
-            and not isinstance(token, bool) for token in sequence)
-            or not isinstance(next_tokens, list)
+            or not all(isinstance(token, int) and not isinstance(token, bool) for token in sequence)
+        ):
+            return None
+
+        if (
+            not isinstance(next_tokens, list)
             or not next_tokens
             or len(next_tokens) > self._beam_width
         ):
             return None
 
         for item in next_tokens:
+            if not isinstance(item, tuple) or len(item) != 2:
+                return None
+            if not isinstance(item[0], int) or isinstance(item[0], bool):
+                return None
             if (
-                not isinstance(item, tuple)
-                or len(item) != 2
-                or not isinstance(item[0], int)
-                or isinstance(item[0], bool)
-                or not isinstance(item[1], (int, float))
+                not isinstance(item[1], (int, float))
                 or isinstance(item[1], bool)
                 or item[1] <= 0
                 or item[1] > 1
@@ -738,10 +741,11 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
+        if not isinstance(prompt, str) or not prompt:
+            return None
+
         if (
-            not isinstance(prompt, str)
-            or not prompt
-            or not isinstance(seq_len, int)
+            not isinstance(seq_len, int)
             or isinstance(seq_len, bool)
             or seq_len <= 0
             or not isinstance(self._beam_width, int)
