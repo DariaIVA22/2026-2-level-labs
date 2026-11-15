@@ -4,6 +4,7 @@ Generation by NGrams starter
 
 # pylint:disable=too-many-locals, unused-import, unused-variable
 from lab_3_generate_by_ngrams.main import (
+    BeamSearchTextGenerator,
     GreedyTextGenerator,
     NGramLanguageModel,
     TextProcessor,
@@ -34,7 +35,12 @@ def main() -> None:
     generator = GreedyTextGenerator(model, text_processor)
     generated = generator.run("Vernon", 51)
     print(f"greedy generated: {generated}")
-    result = generated
+
+    beam_generator = BeamSearchTextGenerator(model, text_processor, 3)
+    beam_generated = beam_generator.run("Vernon", 56)
+    print(f"beam generated: {beam_generated}")
+
+    result = beam_generated
     assert result
 
 
