@@ -117,6 +117,7 @@ class TextProcessor:
         for token, token_id in self._storage.items():
             if token_id == element_id:
                 return token
+        return None
 
     def encode(self, text: str) -> tuple[int, ...] | None:
         """
@@ -265,13 +266,13 @@ class TextProcessor:
 
         decoded_string = ""
 
-        for i in range(len(decoded_corpus)):
+        for i, token in enumerate(decoded_corpus):
             if i == 0:
-                decoded_string += decoded_corpus[i].upper()
-            elif decoded_corpus[i] == self._end_of_word_token:
+                decoded_string += token.upper()
+            elif token == self._end_of_word_token:
                 decoded_string += " "
             else:
-                decoded_string += decoded_corpus[i]
+                decoded_string += token
 
         if decoded_string and decoded_string[-1] != " " and decoded_string[-1] != ".":
             decoded_string += "."
@@ -522,7 +523,7 @@ class GreedyTextGenerator:
 
         sequence = list(encoded_prompt)
 
-        for _ in range(seq_len):
+        for i in range(seq_len):
             candidates = self._model.generate_next_token(tuple(sequence))
             if not candidates:
                 break
@@ -586,8 +587,9 @@ class BeamSearcher:
         if not candidates:
             return []
 
+        items = candidates.items()
         sorted_candidates = sorted(
-            candidates.items(),
+            items,
             key=lambda item: (item[1], item[0]),
             reverse=True,
         )
@@ -616,44 +618,39 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if not isinstance(sequence, tuple) or not sequence:
-            return None
-
-        if not all(isinstance(token, int)
-        and not isinstance(token, bool) for token in sequence):
-            return None
-
-        if not isinstance(next_tokens, list):
-            return None
-
-        if not next_tokens:
-            return None
-
-        if len(next_tokens) > self._beam_width:
+        if (
+            not isinstance(sequence, tuple)
+            or not sequence
+            or not all(isinstance(token, int)
+            and not isinstance(token, bool) for token in sequence)
+            or not isinstance(next_tokens, list)
+            or not next_tokens
+            or len(next_tokens) > self._beam_width
+        ):
             return None
 
         for item in next_tokens:
-            if not isinstance(item, tuple) or len(item) != 2:
-                return None
-            if not isinstance(item[0], int) or isinstance(item[0], bool):
-                return None
-            if not isinstance(item[1], (int, float)) or isinstance(item[1], bool):
-                return None
-            if not (0 < item[1] <= 1):
+            if (
+                not isinstance(item, tuple)
+                or len(item) != 2
+                or not isinstance(item[0], int)
+                or isinstance(item[0], bool)
+                or not isinstance(item[1], (int, float))
+                or isinstance(item[1], bool)
+                or item[1] <= 0
+                or item[1] > 1
+            ):
                 return None
 
-        if not isinstance(sequence_candidates, dict):
-            return None
-
-        if sequence not in sequence_candidates:
+        if (
+            not isinstance(sequence_candidates, dict)
+            or sequence not in sequence_candidates
+        ):
             return None
 
         current_penalty = sequence_candidates[sequence]
-
         updated_candidates = dict(sequence_candidates)
-
         del updated_candidates[sequence]
-
         for token, probability in next_tokens:
             new_sequence = sequence + (token,)
             updated_candidates[new_sequence] = current_penalty - math.log(probability)
@@ -674,33 +671,30 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict):
-            return None
-
-        if not sequence_candidates:
-            return None
-
-        if not isinstance(self._beam_width, int) or self._beam_width <= 0:
+        if (
+            not isinstance(sequence_candidates, dict)
+            or not sequence_candidates
+            or not isinstance(self._beam_width, int)
+            or self._beam_width <= 0
+        ):
             return None
 
         for seq, penalty in sequence_candidates.items():
-            if not isinstance(seq, tuple) or not seq:
-                return None
-            if not all(isinstance(token, int)
-            and not isinstance(token, bool) for token in seq):
-                return None
-            if not isinstance(penalty, (int, float)) or isinstance(penalty, bool):
+            if (
+                not isinstance(seq, tuple)
+                or not seq
+                or not all(isinstance(token, int) and not isinstance(token, bool) for token in seq)
+                or not isinstance(penalty, (int, float))
+                or isinstance(penalty, bool)
+            ):
                 return None
 
         sorted_items = sorted(
             sequence_candidates.items(),
             key=lambda item: (item[1], tuple(-x for x in item[0])),
         )
-
         top_n = sorted_items[: self._beam_width]
-
         return dict(top_n)
-
 
 
 class BeamSearchTextGenerator:
@@ -744,11 +738,15 @@ class BeamSearchTextGenerator:
         In case of corrupt input arguments or methods used return None,
         None is returned
         """
-        if not isinstance(prompt, str) or not prompt:
-            return None
-        if not isinstance(seq_len, int) or isinstance(seq_len, bool) or seq_len <= 0:
-            return None
-        if not isinstance(self._beam_width, int) or self._beam_width <= 0:
+        if (
+            not isinstance(prompt, str)
+            or not prompt
+            or not isinstance(seq_len, int)
+            or isinstance(seq_len, bool)
+            or seq_len <= 0
+            or not isinstance(self._beam_width, int)
+            or self._beam_width <= 0
+        ):
             return None
 
         encoded_prompt = self._text_processor.encode(prompt)
@@ -759,16 +757,13 @@ class BeamSearchTextGenerator:
 
         for _ in range(seq_len):
             new_candidates = {}
-
             for sequence, penalty in sequence_candidates.items():
                 next_tokens = self._get_next_token(sequence)
                 if next_tokens is None:
                     return None
-
                 if not next_tokens:
                     new_candidates[sequence] = penalty
                     continue
-
                 continued = self.beam_searcher.continue_sequence(
                     sequence, next_tokens, {sequence: penalty}
                 )
@@ -783,7 +778,6 @@ class BeamSearchTextGenerator:
             sequence_candidates = pruned
 
         best_sequence = min(sequence_candidates, key=sequence_candidates.get)
-
         return self._text_processor.decode(best_sequence)
 
     def _get_next_token(

@@ -29,8 +29,6 @@ def main() -> None:
     model = NGramLanguageModel(encoded_text, 7)
     build_example =model.build()
     print(f"build example : {build_example}")
-    freq_example = model._n_gram_frequencies
-    print(f"frequencies example: {freq_example}")
 
     generator = GreedyTextGenerator(model, text_processor)
     generated = generator.run("Vernon", 51)
