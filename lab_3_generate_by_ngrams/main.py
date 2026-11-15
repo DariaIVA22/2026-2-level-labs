@@ -640,27 +640,23 @@ class BeamSearcher:
             not isinstance(next_tokens, list)
             or not next_tokens
             or len(next_tokens) > self._beam_width
+            or not isinstance(sequence_candidates, dict)
+            or sequence not in sequence_candidates
         ):
             return None
 
         for item in next_tokens:
             if not isinstance(item, tuple) or len(item) != 2:
                 return None
+            if not isinstance(item[0], int) or isinstance(item[0], bool):
+                return None
             if (
-                not isinstance(item[0], int)
-                or isinstance(item[0], bool)
-                or not isinstance(item[1], (int, float))
+                not isinstance(item[1], (int, float))
                 or isinstance(item[1], bool)
                 or item[1] <= 0
                 or item[1] > 1
             ):
                 return None
-
-        if (
-            not isinstance(sequence_candidates, dict)
-            or sequence not in sequence_candidates
-        ):
-            return None
 
         current_penalty = sequence_candidates[sequence]
         updated_candidates = dict(sequence_candidates)
