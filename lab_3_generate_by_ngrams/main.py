@@ -229,7 +229,7 @@ class TextProcessor:
         if not corpus:
             return None
         if not all(isinstance(i, int) for i in corpus):
-                    return None
+            return None
 
         decoded_corpus = []
 
@@ -257,7 +257,7 @@ class TextProcessor:
         In case of corrupt input arguments, None is returned
         """
         if not isinstance(decoded_corpus, tuple):
-                    return None
+            return None
         if not decoded_corpus:
             return None
         if not all(isinstance(i, str) for i in decoded_corpus):
@@ -425,7 +425,7 @@ class NGramLanguageModel:
         """
         if not isinstance(sequence, tuple) or not sequence:
             return None
-        if not all(type(token) is int for token in sequence):
+        if not all(isinstance(i, int) for i in sequence):
             return None
 
         n = self.__n_gram_size
@@ -461,7 +461,7 @@ class NGramLanguageModel:
         In case of corrupt input arguments, None is returned
         """
         if not isinstance(encoded_corpus, tuple):
-                    return None
+            return None
 
         if self.__n_gram_size <= 0 or len(encoded_corpus) < self.__n_gram_size:
             return None
@@ -575,7 +575,8 @@ class BeamSearcher:
         if not isinstance(sequence, tuple) or not sequence:
             return None
 
-        if not all(type(token) is int for token in sequence):
+        if not all(isinstance(token, int)
+        and not isinstance(token, bool) for token in sequence):
             return None
 
         candidates = self._model.generate_next_token(sequence)
@@ -618,7 +619,8 @@ class BeamSearcher:
         if not isinstance(sequence, tuple) or not sequence:
             return None
 
-        if not all(type(token) is int for token in sequence):
+        if not all(isinstance(token, int)
+        and not isinstance(token, bool) for token in sequence):
             return None
 
         if not isinstance(next_tokens, list):
@@ -633,7 +635,7 @@ class BeamSearcher:
         for item in next_tokens:
             if not isinstance(item, tuple) or len(item) != 2:
                 return None
-            if type(item[0]) is not int:
+            if not isinstance(item[0], int) or isinstance(item[0], bool):
                 return None
             if not isinstance(item[1], (int, float)) or isinstance(item[1], bool):
                 return None
@@ -684,7 +686,8 @@ class BeamSearcher:
         for seq, penalty in sequence_candidates.items():
             if not isinstance(seq, tuple) or not seq:
                 return None
-            if not all(type(token) is int for token in seq):
+            if not all(isinstance(token, int)
+            and not isinstance(token, bool) for token in seq):
                 return None
             if not isinstance(penalty, (int, float)) or isinstance(penalty, bool):
                 return None
@@ -743,7 +746,7 @@ class BeamSearchTextGenerator:
         """
         if not isinstance(prompt, str) or not prompt:
             return None
-        if type(seq_len) is not int or seq_len <= 0:
+        if not isinstance(seq_len, int) or isinstance(seq_len, bool) or seq_len <= 0:
             return None
         if not isinstance(self._beam_width, int) or self._beam_width <= 0:
             return None
@@ -801,7 +804,8 @@ class BeamSearchTextGenerator:
         if not isinstance(sequence_to_continue, tuple) or not sequence_to_continue:
             return None
 
-        if not all(type(token) is int for token in sequence_to_continue):
+        if not all(isinstance(token, int)
+        and not isinstance(token, bool) for token in sequence_to_continue):
             return None
 
         return self.beam_searcher.get_next_token(sequence_to_continue)
