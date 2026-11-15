@@ -528,12 +528,23 @@ class GreedyTextGenerator:
             if not candidates:
                 break
 
-            best_token = max(candidates, key=lambda tok: (candidates[tok], tok))
+            best_token = None
+            best_probability = -1.0
+            for token, probability in candidates.items():
+                if probability > best_probability or (
+                    probability == best_probability
+                    and (best_token is None or token > best_token)
+                ):
+                    best_token = token
+                    best_probability = probability
+
+            if best_token is None:
+                break
+
             sequence.append(best_token)
 
         decoded = self._text_processor.decode(tuple(sequence))
         return decoded
-
 
 
 class BeamSearcher:
@@ -635,10 +646,10 @@ class BeamSearcher:
         for item in next_tokens:
             if not isinstance(item, tuple) or len(item) != 2:
                 return None
-            if not isinstance(item[0], int) or isinstance(item[0], bool):
-                return None
             if (
-                not isinstance(item[1], (int, float))
+                not isinstance(item[0], int)
+                or isinstance(item[0], bool)
+                or not isinstance(item[1], (int, float))
                 or isinstance(item[1], bool)
                 or item[1] <= 0
                 or item[1] > 1
