@@ -683,6 +683,7 @@ class BeamSearcher:
         """
         if not isinstance(sequence_candidates, dict) or not sequence_candidates:
             return None
+
         if not isinstance(self._beam_width, int) or self._beam_width <= 0:
             return None
 
