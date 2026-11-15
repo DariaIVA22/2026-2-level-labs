@@ -699,7 +699,7 @@ class BeamSearcher:
                 valid_candidates[seq] = penalty
 
         if not valid_candidates:
-            return None
+            return {}
 
         sorted_items = sorted(
             valid_candidates.items(),
