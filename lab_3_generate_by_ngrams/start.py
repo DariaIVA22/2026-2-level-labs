@@ -24,6 +24,10 @@ def main() -> None:
 
     text_processor = TextProcessor("_")
     encoded_text = text_processor.encode(text)
+    encoded_text = text_processor.encode(text)
+    if encoded_text is None:
+        print("Encoding failed")
+        return
     decoded_text = text_processor.decode(encoded_text)
 
     model = NGramLanguageModel(encoded_text, 7)

@@ -358,7 +358,7 @@ class NGramLanguageModel:
         """
         self._encoded_corpus = encoded_corpus
         self.__n_gram_size = n_gram_size
-        self._n_gram_frequencies = []
+        self._n_gram_frequencies = {}
 
     def get_n_gram_size(self) -> int:  # type: ignore[empty-body]
         """
