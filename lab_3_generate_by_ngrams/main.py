@@ -642,16 +642,20 @@ class BeamSearcher:
         ):
             return None
 
-        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
-            return None
-
-        if sequence not in sequence_candidates:
+        if (
+            not isinstance(sequence_candidates, dict)
+            or not sequence_candidates
+            or sequence not in sequence_candidates
+        ):
             return None
 
         for item in next_tokens:
-            if not isinstance(item, tuple) or len(item) != 2:
-                return None
-            if not isinstance(item[0], int) or isinstance(item[0], bool):
+            if (
+                not isinstance(item, tuple)
+                or len(item) != 2
+                or not isinstance(item[0], int)
+                or isinstance(item[0], bool)
+            ):
                 return None
             if (
                 not isinstance(item[1], (int, float))
