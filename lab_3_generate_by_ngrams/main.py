@@ -628,51 +628,37 @@ class BeamSearcher:
 
         In case of corrupt input arguments or unexpected behaviour of methods used return None.
         """
-        if (
-            not isinstance(sequence, tuple)
-            or not sequence
-            or not all(isinstance(token, int) and not isinstance(token, bool) for token in sequence)
+        if not(
+            isinstance(sequence, tuple)
+            and all(isinstance(identifier, int) for identifier in sequence)
         ):
             return None
 
-        if (
-            not isinstance(next_tokens, list)
-            or not next_tokens
-            or len(next_tokens) > self._beam_width
+        if not(
+            (isinstance(next_tokens, list) and next_tokens)
+            and len(next_tokens) <= self._beam_width
         ):
             return None
 
-        if (
-            not isinstance(sequence_candidates, dict)
-            or not sequence_candidates
-            or sequence not in sequence_candidates
+        if not(
+            (isinstance(sequence_candidates, dict) and sequence_candidates)
+            and all(
+                (isinstance(candidate, tuple) and isinstance(frequency, float))
+                and all(isinstance(identifier, int) for identifier in candidate)
+                for candidate, frequency in sequence_candidates.items()
+            )
+            and sequence in sequence_candidates
         ):
             return None
 
-        for item in next_tokens:
-            if (
-                not isinstance(item, tuple)
-                or len(item) != 2
-                or not isinstance(item[0], int)
-                or isinstance(item[0], bool)
-            ):
-                return None
-            if (
-                not isinstance(item[1], (int, float))
-                or isinstance(item[1], bool)
-                or item[1] <= 0
-                or item[1] > 1
-            ):
-                return None
+        candidates_copy = dict(sequence_candidates)
+        del candidates_copy[sequence]
 
-        current_penalty = sequence_candidates[sequence]
-        updated_candidates = dict(sequence_candidates)
-        del updated_candidates[sequence]
-        for token, probability in next_tokens:
-            new_sequence = sequence + (token,)
-            updated_candidates[new_sequence] = current_penalty - math.log(probability)
-
-        return updated_candidates
+        for token, frequency in next_tokens:
+            candidates_copy[sequence + (token,)] = (
+                sequence_candidates[sequence] - math.log(frequency)
+            )
+        return candidates_copy
 
     def prune_sequence_candidates(
         self, sequence_candidates: dict[tuple[int, ...], float]
@@ -688,33 +674,22 @@ class BeamSearcher:
 
         In case of corrupt input arguments return None.
         """
-        if not isinstance(sequence_candidates, dict) or not sequence_candidates:
+        if not(
+            (isinstance(sequence_candidates, dict) and sequence_candidates)
+            and all(
+                (isinstance(candidate, tuple) and isinstance(frequency, float))
+                and all(isinstance(identifier, int) for identifier in candidate)
+                for candidate, frequency in sequence_candidates.items()
+            )
+        ):
             return None
 
-        if not isinstance(self._beam_width, int) or self._beam_width <= 0:
-            return None
-
-        valid_candidates = {}
-        for seq, penalty in sequence_candidates.items():
-            if (
-                isinstance(seq, tuple)
-                and seq
-                and all(isinstance(token, int)
-                and not isinstance(token, bool) for token in seq)
-                and isinstance(penalty, (int, float))
-                and not isinstance(penalty, bool)
-            ):
-                valid_candidates[seq] = penalty
-
-        if not valid_candidates:
-            return {}
-
-        sorted_items = sorted(
-            valid_candidates.items(),
-            key=lambda item: (item[1], tuple(-x for x in item[0])),
+        sorted_candidates = sorted(
+            sequence_candidates.items(),
+            key=lambda item: (-item[1], item[0]),
+            reverse=True,
         )
-        top_n = sorted_items[: self._beam_width]
-        return dict(top_n)
+        return dict(sorted_candidates[:self._beam_width])
 
 
 class BeamSearchTextGenerator:
