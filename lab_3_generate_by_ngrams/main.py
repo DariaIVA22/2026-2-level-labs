@@ -437,10 +437,7 @@ class NGramLanguageModel:
         if len(sequence) < context_length:
             return None
 
-        if context_length == 0:
-            context = ()
-        else:
-            context = sequence[-context_length:]
+        context = sequence[-context_length:] if context_length > 0 else sequence[:0]
 
         result = {}
         for n_gram, probability in self._n_gram_frequencies.items():
@@ -603,7 +600,7 @@ class BeamSearcher:
         items = candidates.items()
         sorted_candidates = sorted(
             items,
-            key=lambda item, items=items: (item[1], item[0]),
+            key=lambda item: (item[1], item[0]),
             reverse=True,
         )
 
